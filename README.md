@@ -4,15 +4,6 @@ Magento 2 performance optimizations aimed for developers actively developing for
 
 The idea is to run Magento 2 in production mode for performance, but make adjustments to it so that it does not need to be recompiled and the static files do not need to be redeployed with every change. Additionally, some further adjustments will be necessary to display debugging errors and allow symlinks for module development.
 
-- [ ] Enable production mode:
-
-`php bin/magento deploy:mode:set production`
-
-
-- [ ] Enable all caches:
-
-`php bin/magento cache:enable`
-
 - [ ] Increase error verbosity #1:
 
 ```patch
@@ -174,6 +165,17 @@ index 87a2c37..2871dca 100644
             rewrite ^/static/(version\d*/)?(.*)$ /static.php?resource=$2 last;
         }
     }
+```
+
+Hit it:
+
+```bash
+php bin/magento deploy:mode:set production
+php bin/magento setup:upgrade
+php bin/magento cache:enable
+php bin/magento setup:static-content:deploy
+php bin/magento cache:clean
+php bin/magento cache:flush
 ```
 
 Now if someone could put the above into a Magento 2 module...

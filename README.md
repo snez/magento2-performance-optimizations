@@ -4,16 +4,16 @@ Magento 2 performance optimizations aimed for developers actively developing for
 
 The idea is to run Magento 2 in production mode for performance, but make adjustments to it so that it does not need to be recompiled and the static files do not need to be redeployed with every change. Additionally, some further adjustments will be necessary to display debugging errors and allow symlinks for module development.
 
-Enable production mode:
+- [ ] Enable production mode:
 
 `php bin/magento deploy:mode:set production`
 
 
-Enable all caches:
+- [ ] Enable all caches:
 
 `php bin/magento cache:enable`
 
-Increase error verbosity #1:
+- [ ] Increase error verbosity #1:
 
 ```patch
 diff --git a/app/bootstrap.php b/app/bootstrap.php
@@ -31,7 +31,7 @@ index 6701a9f..fac9b82 100644
  if (!defined('PHP_VERSION_ID') || !(PHP_VERSION_ID === 70002 || PHP_VERSION_ID === 70004 || PHP_VERSION_ID >= 70006)) {
  ```
 
-Increase error verbosity #2:
+- [ ] Increase error verbosity #2:
 
 ```patch
 diff --git a/pub/errors/processor.php b/pub/errors/processor.php
@@ -49,7 +49,7 @@ index 5ca9d82..ee32424 100644
          $config->trash          = 'leave';
 ```
 
-Increase error verbosity #3:
+- [ ] Increase error verbosity #3:
 
 ```patch
 diff --git a/vendor/magento/framework/Webapi/ErrorProcessor.php b/vendor/magento/framework/Webapi/ErrorProcessor.php
@@ -67,7 +67,7 @@ index bb86c6b..edc1f97 100644
          if ($exception instanceof WebapiException) {
 ```
 
-Increase error verbosity #4:
+- [ ] Increase error verbosity #4:
 
 ```patch
 diff --git a/vendor/magento/framework/App/StaticResource.php b/vendor/magento/framework/App/StaticResource.php
@@ -85,7 +85,7 @@ index 87a2c37..a4ee009 100644
              $this->response->setBody($exception->getMessage() . "\n" . $exception->getTraceAsString());
 ```
 
-When we deploy static assets, instead of copying the files, symlink them instead to the originals, so that we do not need to re-deploy them while we are developing the modules:
+- [ ] When we deploy static assets, instead of copying the files, symlink them instead to the originals, so that we do not need to re-deploy them while we are developing the modules:
 
 ```patch
 diff --git a/app/etc/di.xml b/app/etc/di.xml
@@ -104,7 +104,7 @@ index e17505e..193d166 100644
      </virtualType>
 ```
 
-Because we will be using symlinks, we now have to adjust Magento to skip file validation which is normally there for security purposes (i.e. don't do anything stupid on an actual live server). This will also allow us to use modman to symlink modules into the codebase.
+- [ ] Because we will be using symlinks, we now have to adjust Magento to skip file validation which is normally there for security purposes (i.e. don't do anything stupid on an actual live server). This will also allow us to use modman to symlink modules into the codebase.
 
 ```patch
 diff --git a/vendor/magento/framework/View/Element/Template/File/Validator.php b/vendor/magento/framework/View/Element/Template/File/Validator.php
@@ -121,7 +121,7 @@ index 4b4e7e1..8dc7a5f 100644
              $this->_templatesValidationResults[$filename] =
 ```
 
-Also because we are not redeploying the assets, have magento generate them on the fly without refering to a deployment version:
+- [ ] Also because we are not redeploying the assets, have magento generate them on the fly without refering to a deployment version:
 
 ```patch
 diff --git a/vendor/magento/framework/App/View/Deployment/Version.php b/vendor/magento/framework/App/View/Deployment/Version.php
@@ -139,7 +139,7 @@ index 67f6d3c..393a242 100644
                  )
 ```
 
-and
+- [ ] and
 
 
 ```patch
@@ -158,4 +158,23 @@ index 87a2c37..2871dca 100644
                  ConfigOptionsListConstants::CONFIG_PATH_SCD_ON_DEMAND_IN_PRODUCTION
 ```
 
+- [ ] This approach will require a cache clean when an xml file is changed or when an admin config changes, so a command line method of quickly cleaning the cache would be nice:
+
+`alias c='php bin/magento cache:clean'`
+
+- [ ] You probably also want your nginx web server (you are using nginx, right?) to cache the Magento assets, but not the assets from your own modules, so turn off browser caching for http requests that include the name of your module:
+
+```nginx
+    location ~* ^.*(cryozonic|payments|crypto).*\.(ico|jpg|jpeg|png|gif|svg|js|css|swf|eot|ttf|otf|woff|woff2|html)$ {
+        expires off;
+        add_header Cache-Control "no-cache";
+        add_header X-Frame-Options "SAMEORIGIN";
+
+        if (!-f $request_filename) {
+            rewrite ^/static/(version\d*/)?(.*)$ /static.php?resource=$2 last;
+        }
+    }
+```
+
 Now if someone could put the above into a Magento 2 module...
+

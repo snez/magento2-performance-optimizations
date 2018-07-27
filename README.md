@@ -173,8 +173,6 @@ Hit it:
 php bin/magento deploy:mode:set production
 php bin/magento setup:upgrade
 php bin/magento cache:enable
-php bin/magento setup:static-content:deploy
-php bin/magento cache:clean
 php bin/magento cache:flush
 ```
 

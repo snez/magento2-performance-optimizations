@@ -170,13 +170,14 @@ index 87a2c37..2871dca 100644
 Hit it:
 
 ```bash
-php bin/magento deploy:mode:set production
 php bin/magento setup:upgrade
+php bin/magento deploy:mode:set production
 php bin/magento cache:enable
 php bin/magento cache:flush
 rm -rf generated/*
 rm -rf var/generation/*
 rm -rf var/di/*
+php bin/magento setup:static-content:deploy
 ```
 
 Now if someone could put the above into a Magento 2 module...

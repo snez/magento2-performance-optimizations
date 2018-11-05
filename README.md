@@ -177,7 +177,6 @@ php bin/magento cache:flush
 rm -rf generated/*
 rm -rf var/generation/*
 rm -rf var/di/*
-php bin/magento setup:static-content:deploy
 ```
 
 Now if someone could put the above into a Magento 2 module...

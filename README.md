@@ -112,6 +112,23 @@ index 4b4e7e1..8dc7a5f 100644
              $this->_templatesValidationResults[$filename] =
 ```
 
+- [ ] Magento 2.3 specific symlinks adjustment
+
+```patch
+diff --git a/vendor/magento/framework/Filesystem/Directory/PathValidator.php b/vendor/magento/framework/Filesystem/Directory/PathValidator.php
+index fe0e6b3..d3b4b39 100644
+--- a/vendor/magento/framework/Filesystem/Directory/PathValidator.php
++++ b/vendor/magento/framework/Filesystem/Directory/PathValidator.php
+@@ -41,6 +41,7 @@ class PathValidator implements PathValidatorInterface
+         ?string $scheme = null,
+         bool $absolutePath = false
+     ): void {
++        return;
+         $realDirectoryPath = $this->driver->getRealPathSafety($directoryPath);
+         if ($realDirectoryPath[-1] !== DIRECTORY_SEPARATOR) {
+             $realDirectoryPath .= DIRECTORY_SEPARATOR;
+```             
+             
 - [ ] Also because we are not redeploying the assets, have magento generate them on the fly without refering to a deployment version:
 
 ```patch

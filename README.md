@@ -189,6 +189,7 @@ Hit it:
 ```bash
 php bin/magento setup:upgrade
 php bin/magento deploy:mode:set production
+php bin/magento setup:config:set --enable-debug-logging=true
 php bin/magento cache:enable
 php bin/magento cache:flush
 rm -rf generated/*
